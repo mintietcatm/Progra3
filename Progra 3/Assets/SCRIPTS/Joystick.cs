@@ -10,7 +10,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
 
     [SerializeField] private float resetTime; // Cuando sueltas el joystick, el tiempo que tarda en regresar al centro
 
-    [SerializeField] private Vector2 axis; // Este es el valor que los codigos que hagan uso del joystick van a leer
+    [SerializeField] public Vector2 axis; // Este es el valor que los codigos que hagan uso del joystick van a leer
 
     private Touch currentTouch; // Aqui se almacenará la información sobre en que fase de touch se encuentra el jugador (Down, Up, Drag) y la posicion del dedo
 
@@ -87,7 +87,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
         }
 
         // Lerp te mueve un vector a otro punto a razon tiempo indicado
-        if (isDragging && !onUse)
+        if (!isDragging && !onUse)
         {
             joystick.position = Vector3.Lerp(joystick.position, center.position, resetTime * Time.deltaTime);
         }
@@ -132,11 +132,13 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
         isDragging = false;
         transform.position = firstPos;
         axis = Vector3.zero;
+        touchState = 0;
     }
 
     // Cuando nosotros presionemos la pantalla TouchState = 1
     public void OnPointerDown(PointerEventData data)
     {
         touchState = 1;
+        
     }
 }

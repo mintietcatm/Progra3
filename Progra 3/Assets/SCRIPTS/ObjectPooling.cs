@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ObjectPooling2 : MonoBehaviour
 {
+    [SerializeField] private GameObject prefab;
     [SerializeField] private PoolStruct[] objects;
 
     [SerializeField] private List<Transform> spawns;

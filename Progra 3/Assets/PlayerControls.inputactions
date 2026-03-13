@@ -3,7 +3,7 @@
     "name": "PlayerControls",
     "maps": [
         {
-            "name": "Controls",
+            "name": "Player",
             "id": "c55bb444-7923-4674-9552-947d6992d114",
             "actions": [
                 {
@@ -25,7 +25,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Movimiento",
+                    "name": "Move",
                     "type": "Value",
                     "id": "beda508a-9609-4a13-985a-768a62203f32",
                     "expectedControlType": "Stick",
@@ -128,7 +128,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Movimiento",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
