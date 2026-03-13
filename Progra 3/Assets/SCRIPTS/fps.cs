@@ -8,6 +8,6 @@ public class FPSCounter : MonoBehaviour
     void Update()
     {
         float fps = 1f / Time.deltaTime;
-        fpsText.text = "FPS: " + Mathf.Round(fps);
+        fpsText.text = "FPS: " + Mathf.Round(fps); //el texto donde van a venir los fps
     }
 }
