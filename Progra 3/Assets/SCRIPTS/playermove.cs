@@ -1,82 +1,86 @@
-using System.Runtime.CompilerServices;
-using TMPro;
 using UnityEngine;
+using System.Collections;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed;
+    public float moveSpeed = 9f;
+    public float groundDrag = 5f;
+    public float airMultiplier = 0.5f;
 
-    public float groundDrag;
-
-    public float jumpForce;
-    public float jumpCoolDown;
-    public float airMultiplier;
-    bool readyToJump;
-
+    public float jumpForce = 7f;
+    public float jumpCoolDown = 0.25f;
     public KeyCode jumpKey = KeyCode.Space;
 
-    public float playerHeight;
+    public float playerHeight = 2f;
     public LayerMask whatIsGround;
-    bool grounded;
-
-
     public Transform orientation;
 
-    float horizontalInput;
-    float verticalInput;
+    private float horizontalInput;
+    private float verticalInput;
 
-    Vector3 moveDirection;
+    private Vector3 moveDirection;
+    private Rigidbody rb;
 
-    Rigidbody rb;
+    private bool grounded;
+    private bool readyToJump = true;
 
-    private void Start()
+    private float baseJumpForce;
+
+    void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        readyToJump = true;
+
+        baseJumpForce = jumpForce;
     }
 
-    private void FixedUpdate()
+    void Update()
     {
-        MovePlayer();
-    }
-    private void Update()
-    {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
-        MyInput();
+        grounded = Physics.Raycast(
+            transform.position,
+            Vector3.down,
+            playerHeight * 0.5f + 0.2f,
+            whatIsGround
+        );
+
+        GetInput();
         SpeedControl();
+
 
         if (grounded)
             rb.linearDamping = groundDrag;
         else
-            groundDrag = 0;
-    }
-
-    private void MyInput()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
+            rb.linearDamping = 0;
 
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
             readyToJump = false;
             Jump();
-
             Invoke(nameof(ResetJump), jumpCoolDown);
         }
     }
 
+    void FixedUpdate()
+    {
+        MovePlayer();
+    }
+
+    private void GetInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");   
+    }
+
     private void MovePlayer()
     {
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        moveDirection = orientation.forward * verticalInput
+                      + orientation.right * horizontalInput;
 
         if (grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-
-        else if (!grounded)
+        else
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
-
     }
 
     private void SpeedControl()
@@ -93,12 +97,34 @@ public class NewMonoBehaviourScript : MonoBehaviour
     private void Jump()
     {
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     private void ResetJump()
     {
         readyToJump = true;
     }
+
+    public void MultiplyJump(float multiplier)
+    {
+        jumpForce = baseJumpForce * multiplier;
+    }
+
+    public void ResetJumpForce()
+    {
+        jumpForce = baseJumpForce;
+    }
+    public void StartJumpBuff(float multiplier, float duration)
+    {
+        StopAllCoroutines(); 
+        StartCoroutine(JumpBuffRoutine(multiplier, duration));
+    }
+
+    private IEnumerator JumpBuffRoutine(float multiplier, float duration)
+    {
+        jumpForce = baseJumpForce * multiplier;
+        yield return new WaitForSeconds(duration);
+        jumpForce = baseJumpForce;
+    }
+
 }
