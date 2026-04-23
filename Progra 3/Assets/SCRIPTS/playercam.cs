@@ -14,14 +14,16 @@ public class PlayerCam : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false; 
+
+        //Por eso no funcionaba los joysticks xddd
     }
 
     private void Update()
     {
-        float mouseX = Joystick.axis.x * Time.deltaTime * sensX;
-        float mouseY = Joystick.axis.y * Time.deltaTime * sensY;
+        float mouseX = Joystick.axis.x * sensX;
+        float mouseY = Joystick.axis.y * sensY;
 
         yRotation += mouseX;
 

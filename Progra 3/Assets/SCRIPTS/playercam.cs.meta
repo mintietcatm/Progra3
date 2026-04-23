@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 0f25da9dfada4d840a19c6303b4b8db9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - orientation: {instanceID: 0}
+  - Joystick: {fileID: 4184225750388402813, guid: 5b0a45539be680c468d8a29b3f468276, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

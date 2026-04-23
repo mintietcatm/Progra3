@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 1e91b25246f3f4b43a6e213ba4a28770
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - orientation: {fileID: 7270597514687834306, guid: 46f6cfdd502cc8d46bec8f7f29194584, type: 3}
+  - mobileJoystick: {fileID: 3922196094089031164, guid: c88a31da61910a44dad28d0a0f54dad6, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

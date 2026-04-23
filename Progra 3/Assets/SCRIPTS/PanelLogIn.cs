@@ -9,8 +9,8 @@ public class PanelLogIn : MonoBehaviour
   
     public void Login()
     {
-        LogIn.SetActive(true);
-        CreateAcc.SetActive(false);
+        LogIn.SetActive(false);
+        CreateAcc.SetActive(true);
     }
 
     public void CrearCuenta()

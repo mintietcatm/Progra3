@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 05d6b264003034447b85dd546d82ac54
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sonidoRecoger: {instanceID: 0}
+  - efecto: {fileID: 5286485407969965120, guid: ed037692d29d9ee499cbcef39d43e726, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

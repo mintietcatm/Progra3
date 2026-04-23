@@ -26,12 +26,12 @@ public class WeatherManager : MonoBehaviour
 
     public void SetURL(WeatherData data)
     {
-        apiURL = "https://api.openweathermap.org/data/3.0/onecall" +
-                 $"lat={data.latitude}&" +
-                 $"lon={data.longitude}&" +
-                 $"appid={appID}&" +
-                 $"units={(unitType == 0 ? "standar" : (int)unitType == 1 ? "imperial" : "metric")}&" +
-                 $"exclude=minutely,hourly,daily,alerts";
+        apiURL = "https://api.openweathermap.org/data/3.0/onecall?" +
+          $"lat={data.latitude}&" +
+          $"lon={data.longitude}&" +
+          $"appid={appID}&" +
+          $"units=metric&" +
+          $"exclude=minutely,hourly,daily,alerts";
     }
 
     IEnumerator RetrieveWeatherData()
@@ -73,19 +73,20 @@ public class WeatherManager : MonoBehaviour
     {
         float temperatura = weatherDatas[0].temp;
 
-
-        switch (temperatura)
+        if (temperatura < 10)
         {
-            case (0):
-                {
-                    
-                    break;
-                }
-
-            case (>20):
-                {
-                    break;
-                }
+            light.color = Color.blue;
+            light.intensity = 0.5f;
+        }
+        else if (temperatura < 20)
+        {
+            light.color = Color.white;
+            light.intensity = 1f;
+        }
+        else
+        {
+            light.color = Color.red;
+            light.intensity = 1.5f;
         }
     }
 

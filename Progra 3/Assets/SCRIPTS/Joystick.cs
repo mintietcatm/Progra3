@@ -11,6 +11,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
     [SerializeField] private float resetTime; // Cuando sueltas el joystick, el tiempo que tarda en regresar al centro
 
     [SerializeField] public Vector2 axis; // Este es el valor que los codigos que hagan uso del joystick van a leer
+    [SerializeField] private bool isCameraJoystick = false;
 
     private Touch currentTouch; // Aqui se almacenará la información sobre en que fase de touch se encuentra el jugador (Down, Up, Drag) y la posicion del dedo
 
@@ -24,6 +25,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
 
     private bool isDragging = false; // Para saber si estamos arrastrando el dedo
 
+    private bool useMouse = false; //pa que jale con mouse
+
     private void Start()
     {
         margin = GetComponent<RectTransform>();
@@ -32,10 +35,55 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
 
     private void Update()
     {
+        // Mouse support (for editor / PC)
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (RectTransformUtility.RectangleContainsScreenPoint(margin, Input.mousePosition))
+            {
+                useMouse = true;
+                touchState = 1;
+            }
+        }
 
+        if (Input.GetMouseButtonUp(0))
+        {
+            useMouse = false;
+            OnTouchUp();
+        }
         // Este Switch es para acceder al estado del touch en la pantalla
         if (touchState == 1)
         {
+            if (useMouse)
+            {
+                Vector2 mousePos = Input.mousePosition;
+
+                if (RectTransformUtility.RectangleContainsScreenPoint(margin, mousePos))
+                {
+                    currentTouch = new Touch(); 
+                }
+
+               
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (!onUse)
+                    {
+                        OnTouchDown();
+                    }
+                }
+                else if (Input.GetMouseButton(0))
+                {
+                    if (!isDragging)
+                    {
+                        OnTouchDrag();
+                    }
+                }
+                else if (Input.GetMouseButtonUp(0))
+                {
+                    OnTouchUp();
+                }
+
+                return; 
+            }
             foreach (Touch touch in Input.touches) // Por cada touch que este presionando la pantalla voy a
             {
                 if (RectTransformUtility.RectangleContainsScreenPoint(margin, touch.position))
@@ -97,7 +145,9 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
     public void OnTouchDown()
     {
         onUse = true;
-        transform.position = currentTouch.position;
+        transform.position = useMouse ? Input.mousePosition : currentTouch.position;
+        center.position = transform.position;
+        joystick.position = transform.position;
     }
 
     /// <summary>
@@ -110,13 +160,17 @@ public class Joystick : MonoBehaviour, IPointerDownHandler
     {
         Vector2 inputVector; // Este vector es donde voy a hacer toda mi lógica, calculos, etc para mandarselos a mi vector 2 axis
 
-        Vector3 touchPosition = currentTouch.position; // Esto me guarda la posicion de mi dedo
+        //Vector3 touchPosition = currentTouch.position; // Esto me guarda la posicion de mi dedo
+
+        Vector3 touchPosition = useMouse ? (Vector3)Input.mousePosition : currentTouch.position;
 
         // Estas 3 lineas mueven el joystick y lo limitan segun nuestro radio definido
         joystick.position = touchPosition; // Esto nos mueve el joystick siguiendo nuestro dedo
         Vector3 offset = joystick.position - center.position; // Esto nos da la distancia del centro al joystick en vectores
         // Clamp limita un valor segun lo que tu dictes
-        joystick.localPosition = Vector3.ClampMagnitude(offset, radialLimit); // El clamp es limitar un valor entre 2 valores dados
+        //joystick.localPosition = Vector3.ClampMagnitude(offset, radialLimit); // El clamp es limitar un valor entre 2 valores dados
+        offset = Vector3.ClampMagnitude(offset, radialLimit);
+        joystick.position = center.position + offset;
         inputVector = new Vector2(joystick.position.x - center.position.x, joystick.position.y - center.position.y);
         inputVector = (inputVector.magnitude > 1) ? inputVector.normalized : inputVector;
 

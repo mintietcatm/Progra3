@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject panelVictoria;
     public float tiempoEspera = 3f;
+    public PlayFabManager playFabManager;
 
 
     private void Awake()
@@ -46,6 +47,7 @@ public class GameManager : MonoBehaviour
     {
         Tickets--;
         ContadorUI();
+        Debug.Log("Tickets restantes: " + Tickets);
 
         if (Tickets <= 0)
         {
@@ -78,6 +80,7 @@ public class GameManager : MonoBehaviour
             panelVictoria.SetActive(true);
 
         yield return new WaitForSeconds(tiempoEspera);
+        playFabManager.SendLeaderboard(score);
 
         Restart();
     }
@@ -86,5 +89,14 @@ public class GameManager : MonoBehaviour
     {
         string nombreEscena = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene("New Scene");
+    }
+
+    public int score;
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+        Debug.Log("Score: " + score);
+
     }
 }
