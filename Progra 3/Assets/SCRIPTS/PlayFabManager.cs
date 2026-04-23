@@ -10,6 +10,7 @@ public class PlayFabManager : MonoBehaviour
     bool isLoggedIn = false;
 
     public GameObject panelLeaderboard;
+    public GameManager gameManager;
 
     void Start()
     {
@@ -103,6 +104,10 @@ public class PlayFabManager : MonoBehaviour
     public void ShowLeaderbord()
     {
         panelLeaderboard.SetActive(true);
+
+        if (gameManager.panelVictoria != null)
+            gameManager.panelVictoria.SetActive(false);
+
         GetLeaderboard();
     }
 

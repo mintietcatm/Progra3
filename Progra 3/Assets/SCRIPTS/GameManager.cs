@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     public GameObject panelVictoria;
     public float tiempoEspera = 3f;
     public PlayFabManager playFabManager;
+    public TextMeshProUGUI victoryScoreText;
+
+    public PlayFabManager PlayFabManager;
 
 
     private void Awake()
@@ -30,17 +33,18 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
 
-        if (!juegoTerminado && tiempoRestante > 0)
+        if (!juegoTerminado)
         {
             tiempoRestante -= Time.deltaTime;
-            UpdateTimerUI();
 
             if (tiempoRestante <= 0)
             {
                 tiempoRestante = 0;
                 juegoTerminado = true;
-                Restart();
+                StartCoroutine(Victoria());
             }
+
+            UpdateTimerUI();
         }
     }
     public void AddTicket()
@@ -86,20 +90,20 @@ public class GameManager : MonoBehaviour
     {
         juegoTerminado = true;
 
+        if (PlayFabManager.panelLeaderboard != null)
+            PlayFabManager.panelLeaderboard.SetActive(false);
+
         if (panelVictoria != null)
             panelVictoria.SetActive(true);
 
         yield return new WaitForSeconds(tiempoEspera);
+
         playFabManager.SendLeaderboard(score);
 
-        Restart();
+        
     }
 
-    void Restart()
-    {
-        string nombreEscena = SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene("New Scene");
-    }
+
 
     public int score;
 
