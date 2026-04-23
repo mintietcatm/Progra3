@@ -45,6 +45,13 @@ public class ObjectPooling2 : MonoBehaviour
 
             Transform spawn = GetRandomSpawn();
             obj.transform.position = spawn.position;
+
+            Collectible c = obj.GetComponent<Collectible>();
+            if (c != null)
+            {
+                c.spawnPoint = spawn;
+            }
+
             obj.SetActive(true);
         }
     }

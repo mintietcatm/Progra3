@@ -55,11 +55,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+   
+
+    void UpdateScoreUI()
+    {
+        if (Text != null)
+        {
+            Text.text = "Score: " + score.ToString();
+        }
+    }
+
     void ContadorUI()
     {
         if (Text != null)
         {
-            Text.text = "Collectibles Left: " + Tickets.ToString();
+            Text.text =  score.ToString();
         }
     }
     void UpdateTimerUI()
@@ -98,5 +108,6 @@ public class GameManager : MonoBehaviour
         score += amount;
         Debug.Log("Score: " + score);
 
+        UpdateScoreUI();
     }
 }
