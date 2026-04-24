@@ -14,6 +14,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip powerup;
     public AudioClip powerupEnd;
 
+    [Header("UI")]
+    public AudioClip buttonClick;
+
     private void Awake()
     {
         instance = this;
@@ -23,6 +26,12 @@ public class AudioManager : MonoBehaviour
     {
         sfxSource.PlayOneShot(clip);
     }
+
+    public void PlayButtonSound()
+    {
+        PlaySFX(buttonClick);
+    }
+
 
     public void PlayMusic(AudioClip clip)
     {

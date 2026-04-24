@@ -2,6 +2,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 
 public class PlayFabManager : MonoBehaviour
@@ -11,28 +12,31 @@ public class PlayFabManager : MonoBehaviour
 
     public GameObject panelLeaderboard;
     public GameManager gameManager;
+    int playerHighScore = 0;
+    public GameObject panelVictoria;
+    public TMP_InputField inputName;
+
 
     void Start()
     {
-        PlayFabSettings.staticSettings.TitleId = "166A30";
+        PlayFabSettings.staticSettings.TitleId = "166A30";  //Aqui pongo mi usuario de PlayFab para iniciar sesion
         Login();
     }
 
     void Login()
     {
-        var request = new LoginWithCustomIDRequest
+        var request = new LoginWithCustomIDRequest //En lugar de usar una cuenta, "crea" una con el id de la computadora
         {
             CustomId = SystemInfo.deviceUniqueIdentifier,
             CreateAccount = true
         };
 
-        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnError);
+        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnError);  //Aqui lo manda a PlayFab
     }
 
     void OnLoginSuccess(LoginResult result)
     {
-        Debug.Log("Login success");
-        isLoggedIn = true;
+                isLoggedIn = true;
     }
 
     void OnError(PlayFabError error)
@@ -40,7 +44,7 @@ public class PlayFabManager : MonoBehaviour
         Debug.Log(error.GenerateErrorReport());
     }
 
-    public void SendLeaderboard(int score)
+    public void SendLeaderboard(int score)  //Aqui envia el puntaje a PlayFab
     {
         var request = new UpdatePlayerStatisticsRequest
         {
@@ -57,6 +61,21 @@ public class PlayFabManager : MonoBehaviour
         PlayFabClientAPI.UpdatePlayerStatistics(request, success => {
             Debug.Log("Score enviado");
         }, OnError);
+    }
+
+    public void SendLeaderboardIfHighScore(int score) //Aqui revisa que sea un highscore. No lo guarda si es menor al numero
+    {
+        GetPlayerHighScore(() =>
+        {
+            if (score > playerHighScore)
+            {
+                SendLeaderboard(score);
+            }
+            else
+            {
+                Debug.Log("No superó el high score");
+            }
+        });
     }
 
     public void GetLeaderboard()
@@ -78,19 +97,30 @@ public class PlayFabManager : MonoBehaviour
         {
             leaderboardText.text = "";
 
-            foreach (var item in result.Leaderboard)
+            int maxSlots = 10;
+
+            for (int i = 0; i < maxSlots; i++)
             {
-                string name = item.DisplayName;
+                if (i < result.Leaderboard.Count)
+                {
+                    var item = result.Leaderboard[i];
 
-                if (string.IsNullOrEmpty(name))
-                    name = "Player";
+                    string name = item.DisplayName;
+                    if (string.IsNullOrEmpty(name))
+                        name = "Player";
 
-                leaderboardText.text += item.Position + " - " + name + " - " + item.StatValue + "\n";
+                    leaderboardText.text += (i + 1) + " - " + name + " - " + item.StatValue + "\n";
+                }
+                else
+                {
+                   //Para que aparezcan los espacios vacios
+                    leaderboardText.text += (i + 1) + " - --- - 0\n";
+                }
             }
         }, OnError);
     }
 
-    public void SetPlayerName(string playerName)
+    public void SetPlayerName(string playerName)  //Aqui es donde ponermos el nombre del jugador que escribimos 
     {
         var request = new UpdateUserTitleDisplayNameRequest
         {
@@ -111,8 +141,42 @@ public class PlayFabManager : MonoBehaviour
         GetLeaderboard();
     }
 
-    public void HideLeaderboard()
+   
+
+    public void BackToVictory()
     {
         panelLeaderboard.SetActive(false);
+
+        if (panelVictoria != null)
+            panelVictoria.SetActive(true);
     }
+
+    public void GetPlayerHighScore(System.Action callback)
+    {
+        PlayFabClientAPI.GetPlayerStatistics(new GetPlayerStatisticsRequest(),
+        result =>
+        {
+            foreach (var stat in result.Statistics)
+            {
+                if (stat.StatisticName == "HighScore")
+                {
+                    playerHighScore = stat.Value;
+                }
+            }
+
+            callback?.Invoke();
+        },
+        OnError);
+    }
+
+    
+
+    public void SaveName()
+    {
+        SetPlayerName(inputName.text);
+        Debug.Log("Nombre de jugador: " + inputName.text);
+    }
+
+   
+
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using SimpleJSON;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class WeatherManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class WeatherManager : MonoBehaviour
     [SerializeField] private UnitType unitType;
 
     [SerializeField] Light light;
+    [SerializeField] private float transitionSpeed = 2f;
 
     public Volume volume;
 
@@ -18,10 +20,16 @@ public class WeatherManager : MonoBehaviour
 
     private string rawJson;
 
+    private Bloom bloom;
+    private ColorAdjustments colorAdjustments; //Estos son los valores que se van a modificar
+
+
     void Start()
     {
-        SetURL(weatherDatas[0]); // Aqui configuramos el url con la info del primer lugar del a
-        StartCoroutine(RetrieveWeatherData());
+               volume.profile.TryGet(out bloom);
+        volume.profile.TryGet(out colorAdjustments);
+
+        StartCoroutine(WeatherLoop());
     }
 
     public void SetURL(WeatherData data)
@@ -32,6 +40,19 @@ public class WeatherManager : MonoBehaviour
           $"appid={appID}&" +
           $"units=metric&" +
           $"exclude=minutely,hourly,daily,alerts";
+    }
+
+    IEnumerator WeatherLoop()  //Aqui literal estamos haciendo que cambie de lugar cada 15 segundos
+    {
+        while (true)
+        {
+            int randomIndex = Random.Range(0, weatherDatas.Length);
+            SetURL(weatherDatas[randomIndex]);
+
+            yield return StartCoroutine(RetrieveWeatherData());
+
+            yield return new WaitForSeconds(15f);
+        }
     }
 
     IEnumerator RetrieveWeatherData()
@@ -51,14 +72,14 @@ public class WeatherManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Informacion obtenida");
+            //Debug.Log("Informacion obtenida");
             rawJson = request.downloadHandler.text;
 
             DecodeJson();
         }
     }
 
-    private void DecodeJson()
+    private void DecodeJson() //cosas del api
     {
         var currentWeather = JSON.Parse(rawJson); // Nos guarda en una variable el json ya de forma que se puede
 
@@ -71,27 +92,54 @@ public class WeatherManager : MonoBehaviour
 
     private void ChangeWeather()
     {
-        float temperatura = weatherDatas[0].temp;
+        float temperatura = weatherDatas[0].temp;  //Okay, aqui basicamente lo que esta haciendo es sacando la temperatura REAL. weatherDatas[0] es el clima actual y .temp es en grados
 
-        if (temperatura < 10)
+        float targetBloom = 0f;
+        float targetExposure = 0f;   //Y estas son las variables que quiero cambiar, el bloom del nivel y la saturacion. (o color exposure en el volumen)
+
+        if (temperatura < 10) //SI LA TEMPERATURA ESTA FRIA
         {
-            light.color = Color.blue;
-            light.intensity = 0.5f;
+            Debug.Log("Hace frio");
+            targetBloom = 0.02f;
+            targetExposure = -2.5f; //el nivel se pone mas apagado
         }
-        else if (temperatura < 20)
+        else if (temperatura < 20) //SI LA TEMPERATURA ESTA OK
         {
-            light.color = Color.white;
-            light.intensity = 1f;
+            Debug.Log("Its alright");
+            targetBloom = 0.6f;
+            targetExposure = 0f; //el nivel se ve normal
         }
-        else
+        else 
         {
-            light.color = Color.red;
-            light.intensity = 1.5f;
+            Debug.Log("Soleado");
+            targetBloom = 2.0f;
+            targetExposure = 2f; //el nivel se ve mas saturado
         }
+
+        StartCoroutine(SmoothVolumeChange(targetBloom, targetExposure));
     }
 
+    IEnumerator SmoothVolumeChange(float targetBloom, float targetExposure) //Aqui literal esta corrutina es para que el cambio de los colores sea despacito, que no lo haga de golpe y se vea feo
+    {
+        float startBloom = bloom.intensity.value;
+        float startExposure = colorAdjustments.postExposure.value;  //Aqui esta guardando los valores iniciales de la temperatura, que tenia antes del cambio
+
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * transitionSpeed;
+
+            bloom.intensity.value = Mathf.Lerp(startBloom, targetBloom, t);
+            colorAdjustments.postExposure.value = Mathf.Lerp(startExposure, targetExposure, t);
+
+            //Aqui usamos el LERP para que se muevan las variables gradualmente
+
+            yield return null;
+        }
+    }
     [System.Serializable]
-    public struct WeatherData
+    public struct WeatherData  //Aqui este struct es en donde vamos a poner los datos de los lugares
     {
         public string location;
 
@@ -105,7 +153,7 @@ public class WeatherManager : MonoBehaviour
 
     public enum UnitType
     {
-        Standar,
+        Standard,
         Imperial,
         Metric
     }

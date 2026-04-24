@@ -1,2 +1,19 @@
 fileFormatVersion: 2
 guid: 604fd89608f6d724ebe991671035adc5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - musicSource: {instanceID: 0}
+  - sfxSource: {instanceID: 0}
+  - walk: {instanceID: 0}
+  - run: {instanceID: 0}
+  - collect: {fileID: 8300000, guid: 1d6e3a20bc5bf654c9fc6c6eb8ed4ba2, type: 3}
+  - powerup: {instanceID: 0}
+  - powerupEnd: {instanceID: 0}
+  - buttonClick: {fileID: 8300000, guid: 1c1922ecef65f8a47a0ee1342aa9a207, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

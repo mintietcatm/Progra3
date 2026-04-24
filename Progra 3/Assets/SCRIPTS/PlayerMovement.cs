@@ -58,8 +58,8 @@ public class PlayerMovement : MonoBehaviour
         
         if (grounded) rb.linearDamping = groundDrag;
         else rb.linearDamping = 0;
-        Debug.Log("Joystick: " + mobileJoystick.axis);
-        Debug.Log("Joystick");
+        //Debug.Log("Joystick: " + mobileJoystick.axis);
+        //Debug.Log("Joystick");
     }
 
     void FixedUpdate()

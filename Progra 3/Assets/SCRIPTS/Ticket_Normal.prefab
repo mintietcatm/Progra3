@@ -128,7 +128,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Collectible
   scoreValue: 10
-  sonidoRecoger: {fileID: 0}
+  sonidoRecoger: {fileID: 8300000, guid: 1d6e3a20bc5bf654c9fc6c6eb8ed4ba2, type: 3}
+  spawnPoint: {fileID: 0}
   efecto: {fileID: 5286485407969965120, guid: ed037692d29d9ee499cbcef39d43e726, type: 3}
 --- !u!54 &8311794626938675902
 Rigidbody:

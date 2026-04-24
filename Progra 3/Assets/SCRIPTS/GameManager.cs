@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     public PlayFabManager PlayFabManager;
 
 
+
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -96,11 +97,13 @@ public class GameManager : MonoBehaviour
         if (panelVictoria != null)
             panelVictoria.SetActive(true);
 
+        victoryScoreText.text = "Score: " + score;
+
         yield return new WaitForSeconds(tiempoEspera);
 
-        playFabManager.SendLeaderboard(score);
+        playFabManager.SendLeaderboardIfHighScore(score);
 
-        
+
     }
 
 
@@ -113,5 +116,14 @@ public class GameManager : MonoBehaviour
         Debug.Log("Score: " + score);
 
         UpdateScoreUI();
+    }
+
+    //Pa volver a jugar
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; 
+
+        string nombreEscena = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
